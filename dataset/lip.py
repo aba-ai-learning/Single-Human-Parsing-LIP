@@ -55,10 +55,10 @@ class LIP(data.Dataset):
         for line in f:
             image = line.strip("\n")
             if self.train:
-                image_path.append(osp.join(data_dir, 'image', image + ".jpg"))
+                image_path.append(osp.join(data_dir, 'img', image + ".jpg"))
                 gt_path.append(osp.join(data_dir, 'gt', image + ".png"))
             else:
-                image_path.append(osp.join(data_dir, 'image', image + ".jpg"))
+                image_path.append(osp.join(data_dir, 'img', image + ".jpg"))
                 gt_path.append(osp.join(data_dir, 'gt', image + ".png"))
         return image_path, gt_path
 

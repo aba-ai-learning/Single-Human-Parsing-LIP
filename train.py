@@ -24,7 +24,7 @@ models = {
 }
 
 parser = argparse.ArgumentParser(description="Human Parsing")
-parser.add_argument('--data-path', type=str, help='Path to dataset folder')
+parser.add_argument('--data_path', type=str, default='dataset/myLIP/',help='Path to dataset folder')
 parser.add_argument('--backend', type=str, default='densenet', help='Feature extractor')
 parser.add_argument('--snapshot', type=str, default=None, help='Path to pre-trained weights')
 parser.add_argument('--batch-size', type=int, default=16, help="Number of images sent to the network in one step.")
@@ -47,7 +47,8 @@ def build_network(snapshot, backend):
         epoch = int(epoch)
         net.load_state_dict(torch.load(snapshot))
         print("Snapshot for epoch {} loaded from {}".format(epoch, snapshot))
-    net = net.cuda()
+    if torch.cuda.is_available():
+        net = net.cuda()
     return net, epoch
 
 
@@ -107,7 +108,11 @@ if __name__ == '__main__':
 
         for count, (x, y, y_cls) in enumerate(train_loader):
             # input data
-            x, y, y_cls = x.cuda(), y.cuda().long(), y_cls.cuda().float()
+            if torch.cuda.is_available():
+                x, y, y_cls = x.cuda(), y.cuda().long(), y_cls.cuda().float()
+            else:
+                x, y, y_cls = x, y.long(), y_cls.float()
+
             # forward
             out, out_cls = net(x)
             seg_loss, cls_loss = seg_criterion(out, y), cls_criterion(out_cls, y_cls)
