@@ -47,9 +47,12 @@ def build_network(snapshot, backend):
         _, epoch = os.path.basename(snapshot).split('_')
         if not epoch == 'last':
             epoch = int(epoch)
-        net.load_state_dict(torch.load(snapshot))
+        net.load_state_dict(torch.load(
+            snapshot, map_location=torch.device('cpu')))
         logging.info("Snapshot for epoch {} loaded from {}".format(epoch, snapshot))
-    net = net.cuda()
+    if torch.cuda.is_available():
+        net = net.cuda()
+    
     return net, epoch
 
 
@@ -244,7 +247,10 @@ def main():
 
     with torch.no_grad():
         for index, (img, gt) in enumerate(val_loader):
-            pred_seg, pred_cls = net(img.cuda())
+            if torch.cuda.is_available():
+                pred_seg, pred_cls = net(img.cuda())
+            else:
+                pred_seg, pred_cls = net(img)
             pred_seg = pred_seg[0]
             pred = pred_seg.cpu().numpy().transpose(1, 2, 0)
             pred = np.asarray(np.argmax(pred, axis=2), dtype=np.uint8).reshape((256, 256, 1))
