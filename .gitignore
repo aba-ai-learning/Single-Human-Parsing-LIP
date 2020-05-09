@@ -1,0 +1,7 @@
+*.pyc
+
+dataset/ACGPN/*
+dataset/myLIP/*
+dataset/myLIP.zip
+
+
